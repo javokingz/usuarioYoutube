@@ -52,10 +52,32 @@ def create_usuario():
     return bad_request()
 
 
-@api.route('/dispositivo/<id>', methods=['PUT'])
-def update_dispositivo():
-    pass
+@api.route('/usuario/<id>', methods=['PUT'])
+def update_usuario(id):
+    usuario = Usuario.query.filter_by(id=id).first()
+    
+    if usuario is None:
+        return not_found()
+    
+    
+    json = request.get_json(force=True)
 
-@api.route('/dispositivo/<id>', methods=['DELETE'])
-def _dispositivo():
-    pass
+    usuario.id = json.get('id', usuario.id)
+    usuario.nombre = json.get('nombre', usuario.nombre)
+    usuario.nickname = json.get('nickname', usuario.nickname)
+
+    if usuario.save():
+        return response(usuario.serialize())
+    
+    return bad_request()
+
+@api.route('/usuario/<id>', methods=['DELETE'])
+def delete_usuario(id):
+    usuario = Usuario.query.filter_by(id=id).first()
+
+    if usuario is None:
+        return not_found()
+    
+    if usuario.delete():
+        return {'message': 'Se elimino con exito'}
+    return bad_request()

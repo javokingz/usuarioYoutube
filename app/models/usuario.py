@@ -35,6 +35,15 @@ class Usuario(db.Model):
         
         except:
             return False
+    
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except:
+            return False
+
+
 
 
     def __str__(self):
