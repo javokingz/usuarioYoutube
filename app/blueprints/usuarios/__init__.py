@@ -3,15 +3,12 @@ from flask import request
 from app.responses import response 
 from app.responses import not_found
 from app.responses import bad_request
+from werkzeug.utils import secure_filename
 
 from app.models.usuario import *
 
 
 api = Blueprint('api', __name__, url_prefix='/api')
-
-@api.route('/hello_world')
-def hello_world():
-    return {'message': 'Hello World!'}
 
 
 @api.route('/usuarios', methods=['GET'])
@@ -44,7 +41,6 @@ def create_usuario():
         return bad_request()
     
     usuario = Usuario.new(json['nombre'], json['nickname'])
-    
     if usuario.save():
 
         return response(usuario.serialize())
@@ -81,3 +77,83 @@ def delete_usuario(id):
     if usuario.delete():
         return {'message': 'Se elimino con exito'}
     return bad_request()
+
+
+#View para subir imagenes para usuarios
+
+@api.route('/upload_imagen', methods=['POST'])
+def upload_imagen():
+    pic = request.files['pic']
+    usuario_id = request.form['usuario_id']
+    if not pic:
+        return bad_request()
+
+    filename = secure_filename(pic.filename)
+    mimetype = pic.mimetype
+    if not filename or not mimetype:
+        return bad_request()
+
+
+    img = Img(img=pic.read(), nombre=filename, mimetype=mimetype,  usuario_id=usuario_id)
+    db.session.add(img)
+    db.session.commit()
+
+    return 'Img Uploaded!', 200
+
+
+#Endpoints para comentarios
+
+
+@api.route('/comentarios', methods=['POST'])
+def create_comentario():
+    json = request.get_json(force=True)
+    
+    if json.get('comentario') is None:
+        return bad_request()
+
+    if json.get('usuario_id') is None:
+        return bad_request()
+    
+    comentario = Comentario.new(json['comentario'], json['usuario_id'])
+    if comentario.save():
+
+        return response(comentario.serialize())
+    
+    return bad_request()
+
+@api.route('/comentarios', methods=['GET'])
+def get_comentarios():
+    
+    comentarios = Comentario.query.all()
+    return response([
+        comentario.serialize() for comentario in comentarios
+    ])
+
+
+#Endpoints para suscripciones
+
+
+@api.route('/suscripciones', methods=['POST'])
+def create_suscripcion():
+    json = request.get_json(force=True)
+    
+    if json.get('canal') is None:
+        return bad_request()
+
+    if json.get('usuario_id') is None:
+        return bad_request()
+    
+    suscripcion = Suscripcion.new(json['canal'], json['usuario_id'])
+    if suscripcion.save():
+
+        return response(suscripcion.serialize())
+    
+    return bad_request()
+
+@api.route('/suscripciones', methods=['GET'])
+def get_suscripcion():
+    
+    suscripciones = Suscripcion.query.all()
+    return response([
+        suscripcion.serialize() for suscripcion in suscripciones
+    ])
