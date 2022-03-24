@@ -1,3 +1,4 @@
+"""Declaracion de los modelos """
 from . import db
 from datetime import datetime, date
 

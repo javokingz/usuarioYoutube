@@ -13,6 +13,7 @@ api = Blueprint('api', __name__, url_prefix='/api')
 
 @api.route('/usuarios', methods=['GET'])
 def get_usuarios():
+    """Enpoint para traer los usuarios"""
     
     usuarios = Usuario.query.all()
     return response([
@@ -22,6 +23,8 @@ def get_usuarios():
 
 @api.route('/usuario/<id>', methods=['GET'])
 def get_usuario(id):
+    """Endpoint para trer los usuarios por id"""
+
     usuario = Usuario.query.filter_by(id=id).first()
     
     if usuario is None:
@@ -32,6 +35,7 @@ def get_usuario(id):
 
 @api.route('/usuarios', methods=['POST'])
 def create_usuario():
+    """Endopint para crear un nuevo usuario"""
     json = request.get_json(force=True)
     
     if json.get('nombre') is None:
@@ -50,6 +54,8 @@ def create_usuario():
 
 @api.route('/usuario/<id>', methods=['PUT'])
 def update_usuario(id):
+    """Enpoint para actualizr los datos del usuario."""
+
     usuario = Usuario.query.filter_by(id=id).first()
     
     if usuario is None:
@@ -69,6 +75,7 @@ def update_usuario(id):
 
 @api.route('/usuario/<id>', methods=['DELETE'])
 def delete_usuario(id):
+    """Endpoint para eliminar un usuario por id."""
     usuario = Usuario.query.filter_by(id=id).first()
 
     if usuario is None:
@@ -83,6 +90,8 @@ def delete_usuario(id):
 
 @api.route('/upload_imagen', methods=['POST'])
 def upload_imagen():
+    """Url para hacer un upload de una image y ligarla a un usuario."""
+
     pic = request.files['pic']
     usuario_id = request.form['usuario_id']
     if not pic:
@@ -106,6 +115,8 @@ def upload_imagen():
 
 @api.route('/comentarios', methods=['POST'])
 def create_comentario():
+    """ Endpont para crear un comentario. """
+
     json = request.get_json(force=True)
     
     if json.get('comentario') is None:
@@ -123,6 +134,7 @@ def create_comentario():
 
 @api.route('/comentarios', methods=['GET'])
 def get_comentarios():
+    """ Endpoint para traer todos los comentarios. """
     
     comentarios = Comentario.query.all()
     return response([
@@ -135,6 +147,8 @@ def get_comentarios():
 
 @api.route('/suscripciones', methods=['POST'])
 def create_suscripcion():
+    """ Endpoint para crear una suscripcion """
+
     json = request.get_json(force=True)
     
     if json.get('canal') is None:
@@ -152,6 +166,7 @@ def create_suscripcion():
 
 @api.route('/suscripciones', methods=['GET'])
 def get_suscripcion():
+    """ Endpoint para traer todas las suscripciones. """
     
     suscripciones = Suscripcion.query.all()
     return response([
